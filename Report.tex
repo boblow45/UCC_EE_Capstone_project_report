@@ -1,0 +1,256 @@
+\RequirePackage[l2tabu, orthodox]{nag} %checks to see if all packages are upto date and are working correctly.
+\documentclass[twoside,12pt,a4paper]{report}																% doc type
+
+\newcommand*{\DocRoot}{./tex_files}
+
+
+\usepackage{steinmetz} %used for phaseor noatation
+\usepackage{mdwlist} %used to change the spacing of items in itemize
+\usepackage{bm} % allows one to bold face greek letters
+\usepackage[toc,page]{appendix}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}  %used to make algorithms 
+\makeatletter
+
+\def\BState{\State\hskip-\ALG@thistlm}
+\makeatother
+
+\usepackage{nomencl} %Both of these commands are used to make a list of abbreviations.
+\makenomenclature
+
+\usepackage[normalem]{ulem}
+
+\usepackage{setspace}								 														 		% set line spacing
+\renewcommand{\baselinestretch}{1.5} 			   													  % set line spacing	
+
+
+\usepackage[top=2.54cm,bottom = 2.5cm,left   = 3.0cm,right  =2.58 cm]{geometry} 	%commad to edit the margins of the page
+\usepackage{microtype} 												% improves the spacing of the document. it improves final reading of the document
+
+
+\usepackage{sectsty}														%The secsty package provides a set of commands for changing the fount used for the various sectional headings in
+\allsectionsfont{\sffamily\bfseries}
+\usepackage{fontspec}																						%Set font Type
+% \setmainfont{Minion Pro}																					%Set font Type
+%\setsansfont{Myriad Pro}																					%Set font Type
+
+
+\usepackage[english]{babel}
+\usepackage{siunitx}
+
+
+\usepackage{tikz}
+\usetikzlibrary{calc,backgrounds}
+\usetikzlibrary{arrows,positioning} 
+%the following is used in the analog design assignment in 4 year college. it was use to change certain circuit asspects in the tikz package
+\usepackage[ americancurrents,siunitx,arrowmos]{circuitikz}
+\ctikzset{bipoles/capacitor/height/.initial=.4854}
+\ctikzset{bipoles/capacitor/width/.initial=.1}
+\usetikzlibrary{patterns,arrows,decorations.pathreplacing}
+
+% the following  two user defined commonds were used to create a flow diagram for the kalman filter code
+\newcommand*{\h}{\hspace{5pt}}% for indentation
+\newcommand*{\hh}{\h\h}% double indentation
+
+
+
+{\usepackage[draft]{todonotes}
+\usepackage{xcolor}
+
+
+
+
+
+\usepackage{microtype} %  improves spacing of the final document nothing more
+\usepackage{graphicx}  	% allows the use of  \includegraphics for figures 
+\usepackage{subfiles} %allows the use of subfiles and chapters in them (makes the process easier no need for changes)
+%\usepackage{subfigure} % allows one to split a figure up into mulitlpy figures
+
+\usepackage{epstopdf} 
+\usepackage{color} % allows the use of colours in document
+\usepackage{csquotes} %This pack­age pro­vides ad­vanced fa­cil­i­ties for in­line and dis­play quo­ta­tions.
+\definecolor{lightgray}{gray}{0.5}
+\usepackage{verbatim} % allows one to comment large sections of code using
+
+
+
+
+\usepackage{caption} %The cap­tion pack­age pro­vides many ways to cus­tomise the cap­tions in float­ing en­vi­ron­ments like fig­ure and ta­ble, and co­op­er­ates with many other pack­ages.
+\usepackage{subcaption} %does the same as caption but with subcaptions
+\usepackage[reqno]{amsmath} %for use in mathmode
+\usepackage{amssymb}
+
+\usepackage[utf8]{inputenc}
+\usepackage{fancyhdr}																%provides customisable headers and footers
+\pagestyle{fancy}
+\fancypagestyle{plain}{}
+\fancyhf{}
+
+\fancyhead[RE]{\textit{ \nouppercase{Digital Control of a Quad-Rotor}} }
+\fancyhead[LE]{\textit{ \nouppercase{EE4020 - Final Report}} }
+\fancyhead[LO]{\textit{ \nouppercase{Digital Control of a Quad-Rotor}} }
+\fancyhead[RO]{\textit{ \nouppercase{EE4020 - Final Report}} }
+
+\fancyfoot[C]{\thepage}
+\lfoot{}\cfoot{- \thepage ~-}\rfoot{}
+
+
+%\rhead{\fontsize{2pt}{0pt}Preliminary Report }
+%\lhead{\fontsize{2pt}{0pt}EE4020 - Project}
+%\rhead{\scriptsize Department of Electrical and Electronic Engineering, UCC}
+
+% sets page numbers in the footer
+
+
+
+\bibliographystyle{unsrt} 							   													   % bibliograph settings (refference in terms of first citiation)
+\usepackage[nottoc,notlof,notlot]{tocbibind}
+
+
+\definecolor{darkgreen}{RGB}{41,159,49}
+
+\usepackage{hyperref} %allows allows you to add PDF metadata to the compiled PDF. Note has to be complied last with some exceptions
+%\hypersetup{ linkbordercolor= {0 0 1}, citebordercolor = {0 1 0}, urlbordercolor = {0 1 1}, runbordercolor = {0 .7 .7}, filebordercolor =  {0 .5 .5}, menubordercolor = {1 0 0} }
+\hypersetup{colorlinks, citecolor=darkgreen, linkcolor=blue, urlcolor=cyan,unicode=true, linktoc=all,filecolor=magenta, pdfauthor ={Cillian O'Brien},pdffitwindow = true}
+\usepackage{titlesec}
+\usepackage{cite}
+
+
+\titleformat{\chapter}
+{\normalfont\LARGE\bfseries}
+{\thechapter. ~} {0.0em} {} %[\vspace{0.1em}\titlerule]
+
+%sets the font size for sections and subsections 
+\sectionfont{\fontsize{15}{15}\selectfont}
+\subsectionfont{\fontsize{13}{15}\selectfont}
+
+%sets chapter spaceing
+\titlespacing*{\chapter}
+{0pt}{5pt}{10pt}
+
+\titlespacing*{\section}
+{0pt}{20pt}{10pt}
+
+
+\newcommand*\NewPage{\newpage\null\thispagestyle{empty}\newpage}
+
+
+\usepackage[acronym,nonumberlist  ]{glossaries}
+\makeglossaries  
+
+\input{\DocRoot/Abbreviations_and_notations}
+\usepackage{url}
+
+
+
+\makeatletter
+\renewcommand\part{%
+	\if@openright
+	\cleardoublepage
+	\else
+	\clearpage
+	\fi
+	\thispagestyle{empty}%
+	\if@twocolumn
+	\onecolumn
+	\@tempswatrue
+	\else
+	\@tempswafalse
+	\fi
+	\null\vfil
+	\secdef\@part\@spart}
+\makeatother
+
+
+\usepackage{tikz-3dplot}
+\usepackage{pgfplots}
+\usetikzlibrary{shapes,calc,positioning}
+\usepackage{multirow}
+
+\usepackage{textcomp}
+\usetikzlibrary{shapes,arrows}
+
+
+\usepackage{enumitem}
+\setlist[enumerate]{itemsep=0mm}
+
+\newcommand{\nocontentsline}[3]{}
+\newcommand{\tocless}[2]{\bgroup\let\addcontentsline=\nocontentsline#1{#2}\egroup}
+
+\usepackage{listings}             % used to include a coding invertment
+\renewcommand\lstlistingname{Snippet}
+\renewcommand\lstlistlistingname{Code Snippets}
+
+\begin{document}
+
+
+\input{\DocRoot/cover_page.tex}
+%Note the table of figure is in the abstract input in order to inprove readability
+
+\input{\DocRoot/Abstract.tex}
+
+\input{\DocRoot/Declaration.tex}
+
+
+{\color{white}.}
+\thispagestyle{empty}
+\clearpage
+\newpage
+
+
+
+
+
+
+\pagenumbering{roman}
+
+\hypersetup{colorlinks, linkcolor=black}
+\thispagestyle{fancy}
+\tableofcontents
+\listoffigures
+\lstlistoflistings
+\listoftables
+
+\printglossary[type=\acronymtype,title=List of Acronyms]
+
+\printglossary[title=List of Notations]
+
+\newpage
+%\listofmyequations
+\clearpage
+\pagenumbering{arabic}
+\printnomenclature %used to include a list of abbreviations.
+\hypersetup{colorlinks, linkcolor=black}
+
+
+\begin{comment}
+\clearpage{\pagestyle{empty}\cleardoublepage}
+{\color{white}.}
+\thispagestyle{empty}
+\clearpage
+\newpage
+\part{Full Report}
+{\color{white}.}
+\thispagestyle{empty}
+\clearpage
+\newpage
+\end{comment}
+
+\input{\DocRoot/Introduction.tex}
+\input{\DocRoot/Development_of_Model.tex}
+\input{\DocRoot/complementary_filter_main.tex}
+\input{\DocRoot/filtering_section.tex}
+\input{\DocRoot/implementation.tex}
+\input{\DocRoot/Results.tex}
+\input{\DocRoot/report_re.tex}
+\input{\DocRoot/Future_work.tex}
+\input{\DocRoot/conclue.tex}
+
+\input{\DocRoot/appindix.tex}
+
+\bibliography{Bibliography}
+
+\input{\DocRoot/logbook.tex}
+\input{\DocRoot/logbook_term_2.tex}
+\input{\DocRoot/Complementary_filter.tex}
+\end{document}

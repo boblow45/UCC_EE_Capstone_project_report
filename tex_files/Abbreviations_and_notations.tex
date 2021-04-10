@@ -1,0 +1,426 @@
+% abbreviations: %how to call it\gls{ny} (example)
+\newacronym{uav}{{ UAV}}{Unmanned Aerial Vehicles } 
+\newacronym{vtol}{{ VTOL}}{Vertical Take-off and Landing }
+\newacronym{control_engin_depart}{{DCE}}{Department of Control Engineering}
+\newacronym{lqr}{{ LQR}}{Linear-Quadratic Regulator}
+\newacronym{dlqr}{{ DLQR}}{Discrete Linear-Quadratic Regulator}
+\newacronym{ekf}{{ EKF}}{Extended Kalman Filter}
+\newacronym{bldcm}{{ BLDCM }}{Brushless DC Motor}
+\newacronym{lqe}{{ LQE}}{linear quadratic estimation }
+\newacronym{lti}{{ LTI}}{Linear Time-Invariant}
+\newacronym{pwm}{{ PWM}}{Pulse Width Modulation}
+\newacronym{mimo}{{ MIMO}}{Multiple Input Multiple Output}
+\newacronym{gps}{{ GPS}}{Global Positioning System}
+\newacronym{slam}{{ SLAM}}{Simultaneous Localization and Mapping}
+\newacronym{9dof}{{ 9DOF}}{9 Degrees of Freedom}
+\newacronym{dmre}{{ DMRE}}{Discrete Matrix Riccati Equation}
+\newacronym{rmse}{{ RMSE}}{Root Mean Square Error}
+\newacronym{utm}{{ UTM}}{Universal Transverse Mercator}
+\newacronym{wgs}{{ WGS-84}}{World Geodetic System 1984}
+\newacronym{esc}{{ ESC}}{Electronic Speed Controller}
+\newacronym{ned}{{ NED}}{North-East-Down}
+\newacronym{bf}{{ B}}{Body Frame}
+\newacronym{ecef}{{ ECEF}}{Earth Centered Earth Fixed}
+\newacronym{ins}{{ INS}}{Inertial Navigation System}
+\newacronym{fpu}{{ FPU}}{Floating Point Unit}
+\newacronym{imu}{{ IMU}}{Inertial Measurement Unit}
+\newacronym{vr}{{ VR}}{Virtual Realty}
+\newacronym{rc}{{ RC}}{Remote Control}
+
+% nomenclature: how to call it \gls{numofangels} (example)
+\newglossaryentry{timeconstants}{
+  name = {\ensuremath{\tau_m}},
+  description = Motor time constant,
+}
+
+
+\newglossaryentry{Motorcontant}{
+  name = {\ensuremath{K_\omega}},
+  description = Coefficient relating PWM to rate of change of angular velocity of a motor
+}
+
+
+\newglossaryentry{PWMdutycycle}{
+  name =  {\ensuremath{D_i}} ,
+  description = Duty cycle of the PWM signal
+}
+
+
+
+\newglossaryentry{Motortrasferfunction}{
+	name =  {\ensuremath{\Omega_i
+			}} ,
+	description = First order transfer function for motors used in project 
+}
+
+
+
+
+
+
+% % % % % % % %
+% Roll,pitch and yaw symbols
+\newglossaryentry{pitch}{
+	name =  {\ensuremath{\theta}} ,
+		description = Pitch of the Quad-rotor (around Y-axis)
+	}
+
+\newglossaryentry{roll}{
+	name =  {\ensuremath{\phi}} ,
+	description = Roll of the Quad-rotor (around X-axis)
+}
+
+\newglossaryentry{yaw}{
+	name =  {\ensuremath{\psi}} ,
+	description = Yaw of the Quad-rotor (around Z-axis)
+}
+
+
+\newglossaryentry{dampingpitch}{
+	name =  {\ensuremath{\beta_{\theta}}} ,
+	description = Viscous damping of the Quad-rotor around the Pitch axis
+}
+
+\newglossaryentry{dampingroll}{
+	name =  {\ensuremath{\beta_\phi}} ,
+	description = Viscous damping of the Quad-rotor around the Roll axis
+}
+
+\newglossaryentry{dampingyaw}{
+	name =  {\ensuremath{\beta_\psi}} ,
+	description = Viscous damping of the Quad-rotor around the Yaw axis
+}
+
+
+
+
+% % % % %
+% interia symbols
+\newglossaryentry{interiaofpitch}{
+	name =  {\ensuremath{I_\theta}} ,
+	description = Inertia of system about the pitch axis
+}
+
+\newglossaryentry{interiaofroll}{
+	name =  {\ensuremath{I_\phi}} ,
+	description = Inertia of system about the roll axis
+}
+
+\newglossaryentry{interiaofyaw}{
+	name =  {\ensuremath{I_\psi}} ,
+	description = Inertia of system about the yaw axis
+}
+
+% % % % % % % %
+%Motor stuff
+\newglossaryentry{inertiaofmotor}{
+	name =  {\ensuremath{J}} ,
+	description = The total inertia of given motor
+}
+
+\newglossaryentry{dragcoofmotor}{
+	name =  {\ensuremath{d}} ,
+	description =  Drag coefficient of propellers%Relation between moment and the square of the angular velocity of the propellers
+}
+
+\newglossaryentry{trustcoofmotor}{
+	name =  {\ensuremath{b}} ,
+	description =  Coefficient relating angular velocity of a motor to thrust produced by that motor  %Relation between thrust to the square of the angular velocity of the propellers
+}
+
+
+
+\newglossaryentry{reactiontorquedrag}{
+	name =  {\ensuremath{\tau_d}} ,
+	description = The reaction torque of a rotor due to it's drag
+}
+
+
+\newglossaryentry{motortorque}{
+	name =  {\ensuremath{F_i}} ,
+	description = Force produced by a given motor $N$
+}
+
+
+\newglossaryentry{rotationalvelocity}{
+	name =  {\ensuremath{\omega}} ,
+	description = Rotational velocity of a given motor in $rad~s^{-1}$
+}
+
+
+\newglossaryentry{reactiontorque}{
+	name =  {\ensuremath{\tau_r}} ,
+	description = The reaction torque of rotor due to rotational velocity
+}
+
+
+
+% % % % % % % % %
+%Quad-rotor parameters
+\newglossaryentry{lenghtfromcenterofmass}{
+	name =  {\ensuremath{l}} ,
+	description = Position of the propellers from the centre of mass along a given axis
+}
+
+\newglossaryentry{systemmass}{
+	name =  {\ensuremath{m}},
+	description = Mass of the system 
+}
+
+
+
+
+% % % % % % % % % %
+% % Kalman stuff
+\newglossaryentry{noiseinsysystem}{
+	name =  {\ensuremath{ w}} ,
+	description = Noise/disturbance present in system/model
+}
+
+\newglossaryentry{noiseinoutput}{
+	name =  {\ensuremath{v}} ,
+	description = Noise/disturbance present in output/sensor
+}
+
+\newglossaryentry{covariancematrix}{
+	name =  {\ensuremath{{\bf P}_k}} ,
+	description = The covariance matrix of the estimation error
+}
+
+\newglossaryentry{noisecomatrix}{
+	name =  {\ensuremath{\bf R}} ,
+	description = Covariance matrix for the measurement noise
+}
+
+\newglossaryentry{noisecoplantmatrix}{
+	name =  {\ensuremath{\bf Q}},
+		description = Covariance matrix for the disturbances in plant
+	}
+
+\newglossaryentry{kalmangain}{
+	name =  {\ensuremath{K}} ,
+		description = Kalman gain matrix
+	}
+	
+	\newglossaryentry{couplingmatrix}{
+		name =  {\ensuremath{\varGamma}} ,
+		description = The matrix which defines the coupling of process noise into the states
+	}
+	
+	
+		\newglossaryentry{couplingmatrixoutput}{
+			name =  {\ensuremath{\Upsilon}} ,
+			description = The matrix which defines the coupling of measurement noise.
+		}
+	
+		\newglossaryentry{measurement}{
+			name =  {\ensuremath{z_k}} ,
+			description = The sampled measurement given by a sensor
+		}
+	
+			\newglossaryentry{estmateofx}{
+				name =  {\ensuremath{\hat{x}_k}} ,
+				description = Defines the minimum-variance estimate of $x$ at the instant $k$
+			}
+	
+	
+	
+	
+	
+	% % % % % % % % %
+	%  State space stuff
+		\newglossaryentry{Transitionmatrix}{
+			name =  {\ensuremath{\Phi}} ,
+			description = The transition matrix for the system
+		}
+	
+		\newglossaryentry{Bmatrix}{
+			name =  {\ensuremath{B}} ,
+			description = Dependency of the state derivatives  on the input
+		}
+
+		\newglossaryentry{Cmatrix}{
+			name =  {\ensuremath{C}} ,
+			description = Dependency of the Output on the system states 
+		}
+
+
+
+% % % % % % %
+%Comp filter stuff
+
+\newglossaryentry{filterdata}{
+	name =  {\ensuremath{\theta_f}} ,
+	description = Filtered angle generated by a complementary filter
+}
+
+\newglossaryentry{potangle}{
+	name =  {\ensuremath{\theta_p}} ,
+	description = Angle of the system (Quad-Rotor) as given by a potentiometer
+}
+
+\newglossaryentry{potanglerate}{
+	name =  {\ensuremath{\dot{\theta_p}}} ,
+	description = Rate of change angle of the system (Quad-Rotor) as given by a gyroscope
+}
+
+
+
+
+
+% % % % % % %
+%Accelerometer componets 
+
+\newglossaryentry{accdata}{
+	name =  {\ensuremath{\theta_a}} ,
+	description = Angle measured by Accelerometer
+}
+
+\newglossaryentry{ax}{
+	name =  {\ensuremath{{a}_x}} ,
+	description = Acceleration in x direction (Body frame)
+}
+
+\newglossaryentry{ay}{
+	name =  {\ensuremath{{a}_y}} ,
+	description = Acceleration in y direction (Body frame)
+}
+
+\newglossaryentry{az}{
+	name =  {\ensuremath{{a}_z}} ,
+	description = Acceleration in z direction (Body frame)
+}
+
+\newglossaryentry{accbais}{
+	name =  {\ensuremath{{b}_a}} ,
+	description = Matrix composed of the biases on each axes of the Accelerometer.
+}
+
+\newglossaryentry{accbaisx}{
+	name =  {\ensuremath{{b}_{a-x}}} ,
+	description = Component of the bias seen by the Accelerometer on the $x$-axis.
+}
+
+\newglossaryentry{accbaisy}{
+	name =  {\ensuremath{{b}_{a-y}}} ,
+	description = Component of the bias seen by the Accelerometer on the $y$-axis.
+}
+
+\newglossaryentry{accbaisz}{
+	name =  {\ensuremath{{b}_{a-z}}} ,
+	description = Component of the bias seen by the Accelerometer on the $z$-axis.
+}
+
+
+% % % % % % %
+%gyrocomponets 
+
+
+\newglossaryentry{gyrodata}{
+	name =  {\ensuremath{{\omega}_g}} ,
+	description = {Angular velocity measured by Gyroscope  (Body Frame)}
+}
+
+\newglossaryentry{wx}{
+	name =  {\ensuremath{{\omega}_x}} ,
+	description = {Angular velocity in the x direction  (Body Frame)}
+}
+
+\newglossaryentry{wy}{
+	name =  {\ensuremath{{\omega}_y}} ,
+	description = {Angular velocity in the y direction  (Body Frame) }
+}
+
+\newglossaryentry{wz}{
+	name =  {\ensuremath{{\omega}_z}} ,
+	description = {Angular velocity in the z direction  (Body Frame)}
+}
+
+\newglossaryentry{gyrobais}{
+	name =  {\ensuremath{{b}_g}} ,
+	description = Matrix composed of the biases on each axes of the Gyroscope.
+}
+
+\newglossaryentry{gyrobaisx}{
+	name =  {\ensuremath{{b}_{g-x}}} ,
+	description = Component of the bias seen by the Gyroscope on the $x$-axis.
+}
+
+\newglossaryentry{gyrobaisy}{
+	name =  {\ensuremath{{b}_{g-y}}} ,
+	description = Component of the bias seen by the Gyroscope on the $y$-axis.
+}
+
+\newglossaryentry{gyrobaisz}{
+	name =  {\ensuremath{{b}_{g-z}}} ,
+	description = Component of the bias seen by the Gyroscope on the $z$-axis.
+}
+
+% % % % % % % %
+%  Frame stuff
+
+
+
+
+
+\newglossaryentry{rotationmatrix}{
+	name =  {\ensuremath{Rot}} ,
+	description = Rotation matrix used in the project which relates the body frame to the inertial  frame 
+}
+
+\newglossaryentry{skewmatrix}{
+	name =  {\ensuremath{S(\gls{gyrodata})}} ,
+	description = A matrix (known as a skew matrix) that is used to relate $\dot{\gls{rotationmatrix}}$ to \gls{rotationmatrix} 
+}
+
+
+% % % % % % % %
+% Controller stuff
+
+\newglossaryentry{ts}{
+	name =  {\ensuremath{T_s}} ,
+	description = Sampling time of the controller
+}
+
+
+
+% % % % % % % %
+%GPS stuff
+
+\newglossaryentry{latitude}{
+	name =  {\ensuremath{\varphi}} ,
+	description = Latitude of the device as given by a GPS module and is the angle from the equator.
+}
+
+
+\newglossaryentry{longitude}{
+	name =  {\ensuremath{\lambda}} ,
+	description = Longitude of the device as given by a GPS module and is the angle from the Prime Meridian
+}
+
+\newglossaryentry{east}{
+	name =  {\ensuremath{x_n}} ,
+	description = Mapping of longitude on to a Cartesian coordinate system point in the $x$ direction (with East being positive)
+}
+
+\newglossaryentry{north}{
+	name =  {\ensuremath{y_n}} ,
+	description = Mapping of longitude on to a Cartesian coordinate system point in the $y$ direction (with North being positive)
+}
+
+\newglossaryentry{down}{
+	name =  {\ensuremath{z_n}} ,
+	description = Mapping of longitude on to a Cartesian coordinate system point in the $z$ direction (into the earth being positive)
+}
+
+
+\newglossaryentry{dampingx}{
+	name =  {\ensuremath{\beta_x}} ,
+	description = Viscous damping of the Quad-rotor around the x-axis
+}
+
+
+\newglossaryentry{dampingy}{
+	name =  {\ensuremath{\beta_y}} ,
+	description = Viscous damping of the Quad-rotor around the y-axis
+}

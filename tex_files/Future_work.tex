@@ -1,0 +1,13 @@
+\chapter{Future Work}
+
+To-date the critical controllers have been designed, with the roll,pitch and yaw  having been tested on the quad-rotor. Also an $xy$ controller has been designed and the maths required to map \gls{gps} data to \gls{ned} frame where the positional control is implemented has been developed in this report. But as flight data was not collected a Kalman Filter was not implemented to convert the \gls{gps} data to the \gls{ned} frame were the control is implemented. Hence, the next action would be to collect flight data and find \gls{noisecomatrix} and \gls{noisecoplantmatrix} matrices for a \gls{gps} Kalman Filter. In the development of such a filter it maybe required to increase the up-date rate to the positional controller of the quad-rotor by doing more predict stages in the Kalman Filter and then correcting these \enquote{prediction} every $n$ cycles of the Kalman Filter by means of a correction up-date from the \gls{gps} module.  
+
+After the Kalman Filter is developed, the quad-rotor would be semi/fully autonomous. As the \gls{gps} only gives accurate position while having access to four satellites, it might be beneficial to attach a vision system to the quad-rotor so the positional controller will have updates while the \gls{gps} link is broken. Also if a vision system is added to the quad-rotor, it would be possible to fly the quad-rotor in locations where \gls{gps} guidance is not possible, such as indoors.  
+
+If the quad-rotor was capable of flying indoors, then building mapping could be a natural next step. This mapping could be done in two possible ways, by means of Lidar or ultrasonic sensors. The Lidar would be more expensive, but is more accurate, is less prone to interference and has a faster update. The ultrasonic sensors on the order hand are cheaper and require less power, but are less accurate and have a limited of operation.
+
+  
+
+
+
+

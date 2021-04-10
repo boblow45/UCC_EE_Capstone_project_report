@@ -1,0 +1,134 @@
+\chapter{Week 2: 26\textsuperscript{th} January - 1\textsuperscript{st} February }
+ \tocless\section{Objectives}
+
+
+\begin{itemize*}
+	\item Acquire an accurate Drag Coefficient (\gls{dragcoofmotor}) so as the Yaw axis could be controlled correctly.
+	\item Help with the design of the Integral Action on the Roll and Pitch axes.
+	\item See if one can use system identification (least squares) to tune the complementary filter.
+	\item Design an algorithm to self tune the Complementary Filter.
+\end{itemize*}
+
+
+ \tocless\section{Drag coefficient Test}
+Upon reviewing the drag coefficient from previous years it was suspected that it was incorrect as it was a hundred times less than the drag coefficients (\gls{dragcoofmotor}) found in similar quad-rotor project reports (see any of the reports in the current research section in the introduction).  To measure the force produced by the quad-rotor a strain gauge was attached to an end point of the quad-rotor and the distance from the point of rotation to the point of attachment was recorded. Two motor where then turned on and the force in the \gls{yaw}-direction was measure by means of the strain gauge. Note the measurement on the strain  is in $kg$ so it was scaled by 9.81 m s$^{-2}$ to get force, this was taken to be correct as the stain gauge pre-calibrates by using gravity to related the force applied to it to mass acting on it. The motor speed \gls{rotationalvelocity} was also measured using an optical tachometer.This was
+repeated for several \gls{pwm} inputs to the motors. These experimental values were then
+used to calculate drag. Using the following one can relate the drag coefficient (\gls{dragcoofmotor})  to force and \gls{rotationalvelocity} :-
+
+\begin{align}
+\begin{split}
+\gls{reactiontorquedrag} &= \gls{dragcoofmotor}\gls{rotationalvelocity}^2 \\
+\tau &= r \times F \\
+\gls{reactiontorquedrag} &=\frac{r \times F}{\gls{rotationalvelocity}^2}
+	\end{split}
+	\end{align}
+
+ \tocless\section{Design of Integral Action using DLQR}
+The group felt that Integral Action was needed on the \gls{pitch} \& \gls{roll} axes, thus  Integral Action was required as a pre-compensator is not as robust in the face of modelling errors as in Integral Action. Note these modelling errors poses problems when one is designing controllers using the \gls{lqr} method as the performance will not be as \enquote{Optimal} as the design predicts, but that is a discuss that is far to long to be featured here \footnote{For more details please see Chapter 12 of \cite{Artofcontrol}, a great introduction to optimal control, and for more information please read up on \textit{\gls{dmre}}. See \cite{Discrete_control_systems} Section 7.3 and \cite{Digital_control_system_analysis_and_design} Section 10.6 for more detail on \gls{dmre}}. There are many ways to achieve integral control, in this report it was decided to add extra states to the system model which are the time integrals of the real states. If the extra state is called $z$ (not to be confused with the sensor measurement \gls{measurement}) then.
+\begin{equation} 
+z = \int x ~~\mathrm{dt}~~~\mathrm{or}~~~\dot{z} = x \label{eq: intregral action}
+\end{equation}
+ 
+ In the discrete time \eqref{eq: intregral action} can be written as follows:-
+ 
+ \begin{equation}
+ z_{k+1} = z_n  + \gls{ts}x_n 
+ \end{equation}
+ 
+ With the addition of this state the system can now be written as follows:-
+ 
+ \begin{equation}
+ \left[\begin{array}{c} x \\ z\end{array}\right]_{k+1} =  \left[\begin{array}{cc} \gls{Transitionmatrix} & 0\\ \gls{Cmatrix}\gls{ts} & I\end{array}\right]  \left[\begin{array}{c} x\\ z\end{array}\right]_{k} +  \left[\begin{array}{c} \gls{Bmatrix}\\ 0 \end{array}\right] u_k \label{eq: system with intergral action}
+ \end{equation}
+ 
+ Hence \eqref{eq: system with intergral action} can be written as follows, where the tildes represent the augmented vector and matrices:
+ \begin{equation}
+ \tilde{x}_{k+1} = \tilde{\gls{Transitionmatrix}}\tilde{x}_n + \tilde{\gls{Bmatrix}}u_k
+ \end{equation}
+ 
+ Hence using the \gls{dlqr}optimal control approach, one will get a matrix of optimal gains that satisfy the following control law:- 
+ 
+ \begin{equation}
+ u_n = - \left[\begin{array}{cc}
+ K_k^p &K_k^I 
+ \end{array}\right]\left[\begin{array}{c} x\\ z\end{array}\right]_{k} 
+ \end{equation}
+ 
+ Note as the above problem is a discrete time problem one has to use the following \gls{dlqr} cost function:-
+ 
+ \begin{equation}
+ J_k  = \frac{1}{2} \sum_{n=0}^{k-1}(x_n^\intercal Q x_n + u_n^\intercal Ru_n) + \frac{1}{2}x_n^\intercal Q_n x_n
+ \end{equation}
+ 
+  \tocless\section{Tuning of the Complementary Filter using Least Squares }
+ A least squares method of tuning the filter was investigated this week. Using \eqref{eq: comp filter equation used to tune comp filter} one can tune the filter in the continues domain and then emulate it across. This can be done by making the following assumption:-
+ \begin{equation}
+ \gls{filterdata} = \gls{potangle}
+ \end{equation} 
+ 
+ where \gls{potangle} is the angle of the system as given by the potentiometer. Note in order to do this one also needs access to the rate of change of potentiometer angle as denoted as $\dot{\gls{potangle}}$. Hence one can develop a method of tuning the filter as follows:-
+ 
+ 
+ 
+ \begin{align}
+ \begin{split}
+ \gls{potangle} &= \frac{1}{s}\left[ \gls{gyrodata} -\left(K_p + \frac{K_i}{s}\right) (\gls{potangle} - \gls{accdata})\right]\\
+ s\gls{potangle} &= \left[ \gls{gyrodata} -\left(K_p + \frac{K_i}{s}\right) (\gls{potangle} - \gls{accdata})\right]\\
+ \dot{\gls{potangle} }&= \left[ \gls{gyrodata} -\left(K_p + \frac{K_i}{s}\right) (\gls{potangle} - \gls{accdata})\right]\\
+ \dot{\gls{potangle} } - \gls{gyrodata}& = -\left(K_p + \frac{K_i}{s}\right) (\gls{potangle} - \gls{accdata})\\
+ \underbrace{\dot{\gls{potangle} } - \gls{gyrodata}}_{\text{$B_f$}}& = \underbrace{\left[(\gls{gyrodata} - \gls{potangle} ) + \frac{(\gls{gyrodata} - \gls{potangle} )}{s} \right] }_{\text{$A_f$}} \left[\begin{array}{c} K_p\\ K_i\end{array}\right] \label{eq: placer for leasr square eqaution}
+ \end{split}
+ \end{align}
+ 
+Hence using the equation developed in \eqref{eq: placer for leasr square eqaution} one can tune a continues time complementary filter of this form using the following:- 
+\begin{equation}
+\left[\begin{array}{c} K_p\\ K_i\end{array}\right] = (A_f^\intercal A_f)^{-1}A_f^\intercal B_f \label{eq: tuning of complmentry filter in continues time least squares}
+\end{equation} 
+
+ Note the method of tuning the filter as shown in \eqref{eq: tuning of complmentry filter in continues time least squares} was not used in this project as the grouped didn't know $\dot{\gls{potangle} }$, instead an algorithm was create to tune it which is notes in the following section
+  \tocless\section{Algorithm used to self tune the Complementary Filter}
+ 
+ Due to the fact that the group had access to the\enquote{actual} angle \gls{potangle} of the device as potentiometer. It was decided to do a search using a \gls{rmse} \eqref{eq:rmse} with a cross-correlation used to find the delay between the signals so it can be removed when checking the \gls{rmse} term.
+ 
+ \begin{equation}
+ \gls{rmse} = \sqrt{\frac{\sum_{k = 1}^{n} (\gls{filterdata} -\gls{potangle})^2}{n}} \label{eq:rmse}
+ \end{equation}
+ 
+ The cross-correlation function is defined in \eqref{eq: cross-correlation} and is commonly used in signal processing to find the measure of time-lag between to signals, hence it's use here.
+ 
+ \begin{equation}
+ (f \star g)[n] = \sum_{m = -\infty}^{\infty} f^*[m]g[m+n] \label{eq: cross-correlation}
+ \end{equation}
+
+ 
+ 
+ \begin{algorithm}
+ 	\caption{Auto Tuning a Complementary Filter }\label{Alg: auto tune of comp filter}
+ 	\begin{algorithmic}[1]
+ 		\Procedure{Grid search tuning of a Complementary Filter }{}
+ 			\State$K_{p(max)} = 50$;
+ 			\State$K_{i(max)} = 50$;
+ 			\State Grid size = 1000;
+ 		    \State  Previous Error = 100000000;
+ 		    \State $K_{p(it)}$ =linspace(0.1,$K_{p(max)}$,Grid size );
+  		    \State $K_{i(it)}$ =linspace(0.1,$K_{i(max)}$,Grid size );	
+  		    
+  		    	    
+ 		\For {i := 1: (length($K_{p(it)}$)-1)}
+ 		
+ 			\For {j := 1: (length($K_{i(it)}$)-1)}
+ 			 		\State\gls{filterdata} = Filter output using \eqref{Eq: full dfference equation for the second order filter}
+ 					\State signal delay = Output of equation \eqref{eq: cross-correlation} using \gls{filterdata} and \gls{potangle} as inputs.
+ 					\State   \gls{filterdata} = \gls{filterdata}(signal delay :end)
+ 					\State    Error = Output of equation \eqref{eq:rmse} using \gls{filterdata} and \gls{potangle} as inputs.
+ 								\If {(Error  < Previous Error)}
+ 									       \State $K_p$ = $K_{p(it)}$(i);
+ 									        \State $K_i$ = $K_{i(it)}$ (j);
+ 									        \State Previous Error = Error;
+ 								\EndIf
+ 			\EndFor
+ 		\EndFor
+ 		\State \Return {$K_p$ \& $K_i$}
+ 		\EndProcedure
+ 	\end{algorithmic}
+ \end{algorithm}

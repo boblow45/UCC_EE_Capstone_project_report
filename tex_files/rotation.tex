@@ -1,0 +1,112 @@
+\chapter{Rotation Matrix} \label{chap: Rotation Matrix reation}
+\section{Derivation of the Rotation Matrix}
+
+
+\pgfmathsetmacro{\rframe}{1.5}
+\pgfmathsetmacro{\thetavec}{55}
+\pgfmathsetmacro{\phivec}{35}
+\pgfmathsetmacro{\framelengthy}{0.15}
+
+
+
+\pgfmathsetmacro{\endpointx}{2.5}
+\pgfmathsetmacro{\endpointy}{7}
+\pgfmathsetmacro{\endpointz}{1.5}
+
+	\begin{figure}[h!]
+		\centering
+	\begin{tikzpicture}[scale=5,tdplot_main_coords]
+					\tdplotsetcoord{P}{\rvec}{\thetavec}{\phivec}
+					\tdplotsetcoord{Px}{0.55}{90}{\phivec}
+					\coordinate (O) at (0,0,0);
+					
+					
+					\draw[thick,->] (0,0,0) -- (\framelengthsxy,-\framelengthy,0) node[anchor=north east]{$x_n$};
+					\draw[thick,->] (0,0,0) -- (0,\framelengthsxy,0) node[anchor=north west]{$y_n$};
+					\draw[thick,->] (0,0,0) -- (0,0,\framelengthsxy) node[anchor=south]{$z_n$};
+					
+								
+					
+					% NED Frame 
+					\tdplotsetrotatedcoords{\phivec}{\thetavec}{0}
+					\tdplotsetcoord{Q}{\rframe}{\thetavec}{\phivec}
+					\tdplotsetrotatedcoordsorigin{(Q)}
+					%\draw[dashed,tdplot_rotated_coords,-,draw=green,fill=white] (-0.1,-0.1,0)
+					-- (-0.1,0.1,0) -- (0.1,0.1,0)  -- (0.1,-0.1,0)  -- cycle  ;
+					\draw[thick,tdplot_rotated_coords,->,black] (0,0,0)
+					-- (-\framelengthsxy+0.02,0,0) node[thick,left]{$y_b$};
+					\draw[thick,tdplot_rotated_coords,->,black] (0,0,0)
+					-- (0.0,\framelengthsxy,0) node[thick,below]{$x_b$};
+					\draw[thick,tdplot_rotated_coords,->,black] (0,0,0)
+					-- (0,0,\framelengthz) node[thick,above]{$z_b$};
+					
+					
+			  
+				\tdplotsetcoord {end}{\rvec+\endpointx}{\thetavec+\endpointy}{\phivec+\endpointz}
+				\draw node at (end) [joint] (joint2) {};
+				\draw[thick,dashed,->](O) -- node[above]{${\bf \footnotesize P}$}(Q);
+				%\draw[->](Q) -- node {$P$}(end);
+				\draw[thick,dashed,->](Q) -- node[above]{${\footnotesize{\bf \xi^B}}$}(joint2);
+				\draw[thick,dashed,->](O) -- node[below]{${\footnotesize{\bf \xi^N}}$}(joint2);
+			\end{tikzpicture}
+		\caption{General Transform of a Vector}
+		\label{fig: General Transform of a Vector}
+	\end{figure}
+	
+	The unit vector $x_b,y_b,z_b$ define the (B) frame. In terms of the corresponding vectors of frame (N) these unit direction vectors become $x_b^n,y_b^n,z_b^n$,where
+	
+	\begin{equation}
+	x_b^n = \begin{bmatrix}
+	       x_b.x_n\\
+	       x_b.y_n\\
+	       x_b.z_n
+	\end{bmatrix}
+	\end{equation}
+	Thus, the orientation of frame (B) with respect to frame (N) can br defined as $3x3$ matrix.
+	
+	\begin{equation}
+	R_N^B = [x_b^n,y_b^n,z_b^n]
+	\label{eq:rotation matrix derivation}
+	\end{equation}
+	
+	The matrix presented in \ref{eq:rotation matrix derivation} is referred to as a rotation matrix. It  is equal to the rotation that must be applied to (N) to place it at (B)
+	
+	Hence, from figure \ref{fig: General Transform of a Vector} on can define the following equation:-
+	
+	\begin{equation}
+	\xi^N = R_N^B\xi^B + P
+	\label{eq: roatation intermeate}
+	\end{equation} 
+	
+	Manipulating \eqref{eq: roatation intermeate} and using the property $(R^B_N)^{-1}$ = $R_B^N$ = \gls{rotationmatrix},
+	\begin{equation}
+	\zeta^B = \gls{rotationmatrix}(\zeta^N-P)
+	\end{equation}
+	
+	\subsection{Euler Angle Derivation} 
+	
+	As \eqref{eq:rotation matrix derivation} has been already defined, it is now possible to define any 3-D vector mapping using the following \footnote{This is commonly refereed to as the general case of for the Euler Angle Relationship} :-
+	
+	\begin{equation}
+	R^B_N =R^{B'}_N R^{B''}_{B'} R^{B'''}_{B''} 
+	\end{equation}
+	
+	These relationship was used to find the rotation matrix presented in \ref{sec: euler angles}.
+\subsection{Proof of the Transition Matrix used in Kinematic Kalman Filter}
+
+\begin{align}
+\begin{split}
+\dot{x} &= \gls{skewmatrix}x\\
+\int_{x_{k+1}}^{x_{k}}\frac{1}{x}dx &= \int_{k + \gls{ts}}^{k}\gls{skewmatrix}dt\\
+\ln\left|\frac{x_{k+1}}{x_{k}}\right| &= \gls{skewmatrix}\gls{ts}\\
+x_{k+1} &= e^{\gls{skewmatrix}\gls{ts}}x_k = \gls{Transitionmatrix}_kx_k
+\end{split}
+\label{eq:kalman matrix exp proof}
+\end{align}
+
+\eqref{eq:kalman matrix exp proof} uses the matrix exponential to find the transition matrix at each iteration. In other to implement this on a micro-controller \eqref{eq: matrix exponential app} can be truncated \footnote{In this project it was found that 5 terms where sufficient to capture the required information of the matrix exponential} to a set number of terms, which would all \eqref{eq:kalman matrix exp proof} to be implemented on a micro-controller at each up-data of the kinematic Kalman Filter.
+
+\begin{equation}
+e^{\underline{\bf X}} = \sum_{k=0}^{\infty}\frac{1}{k!}{\underline{\bf X}}^k
+\label{eq: matrix exponential app}
+\end{equation}

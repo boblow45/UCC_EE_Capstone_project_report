@@ -1,0 +1,152 @@
+\chapter{Kalman Filter}
+This appendix draws heavily on the work present in \cite{bin}. As stated in the main report the Kalman Filter is a recursive filter which computes corrections to a system based on external measurements. The amount at which the filter corrects the values depends on the current estimate of the system error statistics. Note the filter requires knowledge of linear algebra and stochastic processes. As the filter requires knowledge of stochastic processes it can be quite difficult to understand, fortunately, it can be understood in fairly simple terms. All that is required is an understanding of various common statistical properties, which are presented in Appendix \ref{chap: statist stuff for kaman}
+
+Before the Kalman Filter is introduced the concept of a state vector must be defined as it is central to the formulation of the filters algorithm. A state vector is a set of values which are used to describe the \enquote{state} of the system. For this project, which is a navigation system, the state vector is given as position,velocity,attitude and sensor errors. Since the filter is used to correct errors in a navigation system, working in terms of error states is convenient and for an arbitrary state $x$, the estimate can be defined as follows:-   
+
+\begin{equation}
+\hat{x} = x + \delta x
+\end{equation} 
+
+where $x$ is the true value of the state and $\delta x$ is the error in the estimate. The purpose of the Kalman Filter is to estimate this error $\delta x$ and correct it.
+
+In order to derive such a filter all system equations and measurement equations have to be expanded in a Talyor series. As the error in the states are small, it is only required to keep the first order terms. Hence, the equations are linear. This formulation, where the state errors are filter instead of the states themselves, is known as an extended Kalman Filter.
+
+So as to illustrate the basic principles of the filter,lets begin with the simplest assumptions possible. For a Kalman Filter assume that the mean of all states is zero\footnote{It is required to rearrange the states if there mean is not zero}. For ease the following explanation will only deal with a single state $\delta x$. In this development there will be some \textit{priori} estimate of the initial standard deviation ($\sigma$) and to keep consistent with literature the variance ($\sigma^2$) of the state will be $\bf P$ 
+
+The dynamics of the error state will, in general, be described by some differential equation. So, to begin with assume the equation takes the simple form 
+
+\begin{equation}
+\delta \dot{x}(t) = \alpha\delta x(t)
+\label{eq:kalman ger}
+\end{equation}
+Where $\alpha$ is some constant, thus, \eqref{eq:kalman ger} has the formal solution.
+
+\begin{equation}
+\delta x(t+\gls{ts}) = e^{\alpha\gls{ts}}\delta x(t) = \gls{Transitionmatrix}(\gls{ts}) \delta x(t) \label{eq: formal solution kalman}
+\end{equation}
+Where the state transition matrix has been defined as $\gls{Transitionmatrix}(\gls{ts})$ = $e^{\alpha \gls{ts}}$. The state transition matrix describes the evolution of the system error states in time, when no measurements are being processed.
+
+By definition, the variance of the error state is {\bf P} = E[$\delta x^2$]. By assumption, E[$\delta x$] = 0. Applying this operator to \eqref{eq: formal solution kalman}, the following will be arrived at:-
+\begin{equation}
+{\bf P}(t + \gls{ts}) =  \gls{Transitionmatrix}(\gls{ts}){\bf P}(t)\gls{Transitionmatrix}(\gls{ts}) 
+\label{eq:a3}
+\end{equation}
+
+Note the above equation is defined in this form so as to correspond to the form it will take when considering state vectors of more than one dimension (a non-scaler).
+
+Now lets consider the effect of a measurement on the system. Assume that there is access to an external measurement of $x$ which is corrupted by noise.
+
+\begin{equation}
+\tilde{x} = x + \gls{noiseinoutput}
+\end{equation}
+Where $\tilde{x}$ is the measured value of $x$ and \gls{noiseinoutput} is a zero-mean Gaussian white sequence of variance \gls{noisecomatrix}. Next a measurement residual is defined as follows:-
+
+\begin{equation}
+z = \hat{x} - \tilde{x} = \delta x + \gls{noiseinoutput} 
+\label{eq:a5}
+\end{equation} 
+
+Since the measurement is corrupted by noise, some method of weighting the measurement in correcting the state variable is required. This problem of computing optimal gains is the heart of the Kalman Filter. Thus, it is required to compute the Kalman Gains, \gls{kalmangain}, in the following equation:-
+\begin{equation}
+\hat{x} = \hat{x} - \gls{kalmangain}z \label{eq: a6}
+\end{equation}
+Where $\gls{kalmangain}z$ is the best estimate of the error state.
+
+As \gls{noisecomatrix} is the variance of the measurement error and {\bf P}  is the variance of our estimate of $\delta x$,thus, it is expected that the gains are a function of these two variables. Hence, the following result is valid for one dimension:-
+\begin{equation}
+\gls{kalmangain} = \frac{P}{P + \gls{noisecomatrix}} \label{eq: kalman gain single}
+\end{equation}
+ 
+Equation \ref{eq: kalman gain single} makes logical sense. If the measurement is more accurate than the state error, then $\gls{noisecomatrix} \ll {\bf P}$ and $\gls{kalmangain} \cong 1$. In this case, \eqref{eq: kalman gain single} is approximately the as \eqref{eq: a6}. If the state error is more accurate than the measurement, there should be little correction due to the measurement. In this case $\gls{noisecomatrix} \gg {\bf P}$ and $\gls{kalmangain}\cong {\bf P}/\gls{noisecomatrix}$ so the correction is very small. Thus the Kalman Gains make a great deal of sense (in the trivial case). Of course, this is not a derivation of the gain equations, but in this case the concern is not but on mathematical rigor, but instead on a simple method of defining the Kalman Gain. This simple method also has the advantage of being computational less intensive than the rigorous Kalman Gain methods which are presented in most text books (see \cite[pg 791-794]{Artofcontrol}). Hence, this method of computing the Kalman Gain \gls{kalmangain} is capable of being calculated on a low cost micro-controller.    
+
+Once a measurement has been taken, the variance of {\bf P} must be up-dated to reflect this new information. The result for one dimension is as follows:-
+\begin{equation}
+P = PR/(R+P) \label{eq:a8}
+\end{equation}
+
+
+	
+\newpage
+\section{Basic Kalman Filter for $n$-dimensional vector}
+Since $x$ is in general an $n$-dimensional vector, {\bf P} will be an $nxn$ matrix. The above equations will become correspondingly more complicated, but the principle will remain the same. Before the introduction of higher dimensional spaces, lets summarize the process descried thus far. The sequence of events is as follows:
+
+
+\begin{enumerate}[itemsep=1mm]
+	\item The variance of $\delta x$ is initialized as $P_0$
+	\item The variance is propagated forward in time to the first measurement as:-
+	\[P_1 = \gls{Transitionmatrix}(\gls{ts})P_0\gls{Transitionmatrix}(\gls{ts})\]
+	\item The gain is computed based on this value of {\bf P} and the measurement error variance,
+	\[K_1=P_1/(P_1 + \gls{noisecomatrix})\]
+	\item The measurement residual is computed as $z = \hat{x} - \tilde{x}$
+	\item The state vector is corrected according to $\hat{x} = \hat{x} - \gls{kalmangain}_1 z$
+	\item The variance of $\delta x$ is updated to reflect the measurement as
+	\[P_1'= P_1\gls{noisecomatrix}/(\gls{noisecomatrix}+P_1)\]
+	\item This variance is propagated forward to the next measurement as
+	\[P_1 = \gls{Transitionmatrix}(\gls{ts})P_1\gls{Transitionmatrix}(\gls{ts})\]
+\end{enumerate}
+Thus, the process begins again
+
+
+Note, $P'_k$ denotes the value of $P$ immediately after the $k^{th}$ measurement and $P_k$ to denote its value immediately before.
+
+In this description, the noise present in the process \gls{noisecoplantmatrix} has been neglected. This effect takes the form of a random forcing function in \eqref{eq:kalman ger}.
+\begin{equation}
+\delta \dot{x}(t) = \alpha\delta x(t) + \gls{noiseinoutput}
+\end{equation}
+where \gls{noiseinoutput} is a zero-mean Gaussian white noise of power spectral density $N$. This will add a term to \eqref{eq: formal solution kalman} as follows:-
+
+
+\begin{align}
+\begin{split}
+\delta x(t+\gls{ts}) &= e^{\alpha\gls{ts}}\delta x(t) + \int_{t}^{t+\gls{ts}}\left[e^{\alpha(\tau-t)}\right]\gls{noiseinoutput}d\tau \\
+&= \gls{Transitionmatrix}(\gls{ts}) \delta x(t) + \int_{t}^{t+\gls{ts}}\left[\gls{Transitionmatrix}(\tau - t)\right]\gls{noiseinoutput}d\tau 
+\end{split} 
+\end{align}
+and \eqref{eq:a3} is also adjusted as follows:-
+
+\begin{equation}
+{\bf P}(t + \gls{ts}) =  \gls{Transitionmatrix}(\gls{ts}){\bf P}(t)\gls{Transitionmatrix}(\gls{ts}) + \gls{noisecoplantmatrix}
+\end{equation}
+Where
+\begin{equation}
+\gls{noisecoplantmatrix} = N\int_{t}^{t+\gls{ts}}\left[e^{2\alpha(\tau-t)}\right]d\tau \cong N\gls{ts}~~~\mathrm{for}~~~2\alpha\gls{ts} \ll 1.
+\end{equation}
+All other equations remain the same.
+
+As stated previously, $\delta x$, is in general,  a vector defined as follows:-
+
+\begin{equation}
+\delta \underline{x} = \begin{bmatrix}
+\delta x_1\\
+\delta x_2\\
+\vdots\\
+\delta x_n
+\end{bmatrix}
+\end{equation}
+\label{eq:a10}
+P now becomes an $n\times n$ matrix defined as follows:-
+\begin{equation}
+P=E[\delta \underline{x}\delta \underline{x}^\intercal]
+\end{equation}
+where $\delta \underline{x}^\intercal$ is the transpose of \eqref{eq:a10}. This is referred to as the covariance matrix. The diagonal elements will be the variances of the individual error states. The off-diagonal elements will be a measure of the correlations between the corresponding diagonal elements. Correlations are important as they permit the indirect estimate of a state by measuring a correlated state. Correlations may arise through the state transition matrix or through measurements.
+
+The measurement \eqref{eq:a5}
+\begin{equation}
+\underline{z} = \underline{H} \delta x + \gls{noiseinoutput}
+\end{equation}
+Where $\underline{H}$ is the measurement (or observation) matrix. The vector form of the measurement assumes that more that one measurement is taken. This equation also assumes that the measurements consist of quantities that can be expanded in terms of the components of the error state vector. We made this linearization assumption at the beginning. Equation \ref{eq:a3} generalizes to the following:-
+
+\begin{equation}
+{\bf P}(t + \gls{ts}) =  \gls{Transitionmatrix}(\gls{ts}){\bf P}(t)\gls{Transitionmatrix}(\gls{ts})^\intercal + \gls{noisecoplantmatrix}
+\end{equation}
+Where \gls{noisecoplantmatrix} is a matrix generalization of the process noise term. The state transition matrix will not, in general, be a simple exponential. Computation of this matrix will usually require some form of numerical integration.
+
+For optimal gain \eqref{eq: kalman gain single} and \eqref{eq:a8} become the following:-
+\begin{equation}
+\gls{kalmangain} = PH^\intercal(HPH^\intercal + \gls{noisecomatrix})^{-1}
+\end{equation}
+and
+\begin{equation}
+P' = [I-\gls{kalmangain}H]P
+\end{equation}
+In the above, \gls{noisecomatrix} is now a matrix of noise associated with each element of the measurement vector. Note this development of the Kalman Filter is not mathematical rigid and is a simplified version which can be used on micro-control. While for a more detailed please consult \cite{An_Introduction_to_the_Kalman_Filter,kalman1960new}  

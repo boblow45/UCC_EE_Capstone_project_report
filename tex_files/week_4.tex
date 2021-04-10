@@ -1,0 +1,181 @@
+\chapter{Week 4: 13\textsuperscript{th}  - 19\textsuperscript{th} Oct}
+ \tocless\section{Objectives}
+\begin{itemize}
+	\item Finish I\textsuperscript2C communication with accelerometer and magnetometer
+	\item Understand how to acquire angles from the 9DOF output data (even if one is not hovering)
+\end{itemize}
+
+ \tocless\section{Accelerometer}
+\subsection{Theory behind Accelerometer}
+The accelerometer is used to measure the direction of the gravity vector, g\textsuperscript I , in order to define the pitch and roll angles; let it be taken as constant, pointing down along $U_D$ with an intensity $g_0$ = 9.81 $\mathrm{m~s^{-2}}$ and let
+$\bar{\bf a}^B$ denote the accelerometer measurement vector.
+
+The accelerometer used in the project ADXL345 uses the piezoelectric effect to create electric signal due to accelerative forces due to the structure used in the measure accelerometer (micro-crystal structure). Knowing how the device works one can write the following equation.
+
+\begin{equation}
+\bar{\bf a}^B = \gls{rotationmatrix}g^I - a^B +\mu_a+ \gls{accbais}  \label{eq:acc full equation}
+\end{equation}
+Where: $\bar{\bf a}^B$is the sensor output in $\mathrm{m~s^{-2}}$;  g\textsuperscript I is the gravity vector in the inertial frame; a\textsuperscript B is the acceleration of the craft; $\mu_a$ is the Gaussian noise component; $\mathrm{b}_a$ is the constant bias of the accelerometer.
+
+
+Note if the 9DOF stick is placed at the centre of mass or close to it \eqref{eq:acc full equation} can  be shown to simplify to \eqref{eq:acc simplified equation}. Note  \eqref{eq:acc simplified equation} doesn't account for the fact that quad-rotor could be in free
+fall in a horizontal position. If this occurred the output of the accelerometer should be 0. This could be a problem if one is not aware of it.
+
+\begin{equation}
+		\begin{bmatrix}
+		\gls{ax}\\ \gls{ay} \\\gls{az} 
+		\end{bmatrix}
+		= 
+		g
+		\begin{bmatrix}
+		-S_{\gls{pitch}}\\ C_{\gls{pitch}}S_{\gls{roll}}\\C_{\gls{pitch}}C_{\gls{roll}} 
+		\end{bmatrix}
+		+
+		\begin{bmatrix}
+		\mu_{m-x}\\ \mu_{m-y}\\\mu_{m-z}
+		\end{bmatrix}		
+		+
+		\begin{bmatrix}
+		\gls{accbaisx}\\ \gls{accbaisy}\\\gls{accbaisz}
+		\end{bmatrix}
+\label{eq:acc simplified equation}
+\end{equation}
+
+ \tocless\subsection{Accelerometer code}
+
+\begin{algorithm}
+	\caption{Communication with Accelerometer}\label{Alg: acclermeter setup}
+	\begin{algorithmic}[1]
+	\Procedure{Accelerometer setup}{}
+	\State {Device\_ID} \gets {Register{\bf 0x00} value} 									\Comment {Should return 0xE5}
+	
+	        \If{Device\_ID$ \neq \mathrm{0xE5}$}
+	        \Return Error with Accelerometer
+	        \EndIf
+	        
+	\State  {Register {\bf 0x2C }} \gets {\bf 0x0B}  											\Comment {Set sampling rate to 200 Hz}
+	\State  {Register {\bf 0x2D }} \gets {\bf 0x08}												\Comment{Set device to measure mode}
+	\State {Register {\bf 0x38 }} \gets {\bf 0x84}														\Comment{Set FIFO to stream}
+	\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+	\begin{algorithm}
+		\caption{Read data from Accelerometer}\label{Alg: read from accel}
+		\begin{algorithmic}[1]
+		\Procedure{Read data from Magnetometer}{}
+		\While{Accelerometer availble}		
+		\State{Reg\_Read[]} \gets { Registers $0\mathrm{x}32 ~ \mathrm{to}~ 0\mathrm{x}38 $}. 		\Comment {Read devices registers}
+		\For {$i := 0 ~ \mathrm{to}~ 6 ~\mathrm{step} ~2$ }
+		\State {Results[$i$/2] } \gets {\bf Convert\_2\_sgn}(Reg\_Read[$i$+1],Reg\_Read[$i$])
+		\EndFor	
+		%		\State Concatenate (0x33 and 0x32), (0x35 and 0x34) and  (0x37 and 0x36) which are the X,Y and Z registers respectably.
+		%		\State {\bf Results} = XOR the concatenated results with 0x00FF, add 1 and multiply by -1 (convert from 2's complement). 
+		\State \Return {Results}
+		\EndWhile
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+
+ \tocless\subsection{Theory behind Compass}
+The compass is a sensor designed to detect the magnetic North direction, written as {\bf  N\textsuperscript I}. By the definition of the reference frame and neglecting  magnetic inclination and magnetic declination, {\bf  N\textsuperscript I} = [1,0,0]\textsuperscript T.
+
+A Honeywell HMC5883L was used in this project. The device works by measuring the change in resistance with a change in the applied magnetic field. The device can measure these change as it is made from strips of permalloy. As the device can measure the change in magnetic field, the orientation of the magnetic field can be estimated. Let $\bar{N}^B$ be the sensor measurement; considering the frame system, a Gaussain measurement noise, $\mu_m$, and a bias term, $b_m$. Knowing these values the following equation can be defined.
+\begin{equation}
+	\bar{\bf N}^B = \gls{rotationmatrix}N^I + \mu_m + \gls{gyrobais} \nonumber
+\end{equation}
+
+\begin{equation}
+		\begin{bmatrix}
+		\bar{\bf N}_x \\ \bar{\bf  N}_y \\\bar{\bf  N}_z 
+		\end{bmatrix}
+		= 
+		\begin{bmatrix}
+		C_{\gls{pitch}}C_{\gls{yaw}}\\ C_{\gls{yaw}}S_{\gls{roll}}S_{\gls{pitch}} - C_{\gls{roll}}S_{\gls{yaw}}\\C_{\gls{yaw}}C_{\gls{roll}}S_{\gls{pitch}} + S_{\gls{roll}}S_{\gls{yaw}}
+		\end{bmatrix}
+		+
+		\begin{bmatrix}
+		\mu_{m-x}\\ \mu_{m-y}\\\mu_{m-z}
+		\end{bmatrix}		
+		+
+		\begin{bmatrix}
+		\gls{gyrobaisx}\\ \gls{gyrobaisy}\\\gls{gyrobaisz}
+		\end{bmatrix}\label{eq: magnetometer read out}			
+\end{equation}
+
+
+
+When the quad-rotor is hovering, one can assume that the compass is held horizontally ($\gls{pitch} = \gls{roll} = 0$) and \eqref{eq: magnetometer read out} simplifies to \eqref{eq: mag read out simp}.
+
+
+\begin{equation}
+\begin{bmatrix}
+\bar{\bf  N}_x \\ \bar{\bf  N}_y \\\bar{\bf  N}_z 
+\end{bmatrix}
+= 
+\begin{bmatrix}
+C_{\gls{yaw}}\\ - S_{\gls{yaw}}\\0
+\end{bmatrix}
++
+\mu_{m}
++
+b_{m}
+\label{eq: mag read out simp}
+\end{equation}
+
+ \tocless\subsection{Compass code}
+
+\begin{algorithm}
+	\caption{Communication with Magnetometer}\label{Alg: Magnetometer setup}
+	\begin{algorithmic}[1]
+		\Procedure{Magnetometer setup}{}
+	\State {Device\_ID} \gets {Register{\bf 0x0A} value} 									\Comment {Should return 0x48}
+	
+	\If{Device\_ID$ \neq \mathrm{0x48}$}
+	\Return Error in Magnetometer
+	\EndIf
+	
+	\State  {Register {\bf 0x00 }} \gets {\bf 0x78}  											\Comment {Set number of samples to average}
+	\State  {Register {\bf 0x01}} \gets {\bf 0xA0}												\Comment{Set gain {LSB/Gauss} }
+	\State {Register {\bf 0x02 }} \gets {\bf 0x00}														\Comment{Set mode to continues-measurement mode}
+	\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+	\caption{Read data from Magnetometer}\label{Alg: read from Magnetometer}
+	\begin{algorithmic}[1]
+		\Procedure{Read data from Magnetometer}{}
+		\While{Accelerometer availble}		
+		\State{Reg\_Read[]} \gets{ Registers $0\mathrm{x}32 ~ \mathrm{to}~ 0\mathrm{x}38 $}.
+		\For {$i := 0 ~ \mathrm{to}~ 6 ~\mathrm{step} ~2$ }
+		\State {Results[$i$/2] } \gets { Gain\_Factor*\bf Convert\_2\_sgn}(Reg\_Read[$i$],Reg\_Read[$i$+1]) %\comment{Note registers are aranged in X,Z,Y}
+		\EndFor
+%		\State Concatenate (0x33 and 0x32), (0x35 and 0x34) and  (0x37 and 0x36) which are the X,Y and Z registers respectably.
+%		\State {\bf Results} = XOR the concatenated results with 0x00FF, add 1 and multiply by -1 (convert from 2's complement). 
+		\State \Return {Results}
+		\EndWhile
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}
+	\caption{Convert 2s complement to decimal}\label{Alg:  2's complement to decimal}
+	\begin{algorithmic}[1]
+	\Function{Convert\_2\_sgn}{MSB,LSB}	
+	
+	Con\_Array \gets ((Reg\_MSB <<8) \& 0xFF00) | (Reg\_LSB \& 0xFF)
+	
+	\If {Con\_Array >= 0x8000}		
+	\State Con\_array \gets Con\_array $\oplus$  0xFFFF 
+	\State Con\_array \gets Con\_array +1
+	\State Con\_array \gets  -1 * Con\_array
+	\EndIf
+	\Return  Con\_array
+	\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+The \ref{Alg: auto tune of comp filter} worked well and gave a adequate  filtering when using the values returned by the program.

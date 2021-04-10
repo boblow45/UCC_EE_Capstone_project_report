@@ -1,0 +1,130 @@
+	\chapter{Definition of Statistics used in the Implementation of the Kalman Filter} \label{chap: statist stuff for kaman}
+	\section{Mean}
+	The mean or average value of a time-varying signal $x(t)$ can be found by taking a total of $N$ measurements of $x(t)$ at regular intervals. Hence, the mean can then be found by means of \eqref{eq: mean} 
+	
+	\begin{equation}
+	\bar{x} = \frac{1}{N}\sum_{k=1}^{N}x_k
+	\label{eq: mean}
+	\end{equation}
+Note the mean is also stated/known as the expected value, which is denoted $E[x]$. Therefore $E[x] = \bar{x}$.
+
+\section{Standard Deviation}
+
+The standard deviation is a statistic that gives an indication into how tightly all the measurements $x(t)$ are clustered around the mean value in a set of data. It is found by calculating the root-mean-square of the deviations of the samples from the mean and is defined as follows :-
+
+\begin{equation}
+\sigma_x = \sqrt{\frac{1}{N} \sum_{k=1}^{N} (x_k - \bar{x})^2}
+\end{equation}   	
+	
+	
+	\section{Variance}
+	The variance of a set of data provides information about how far samples of $x(t)$ are spread around/from the expected value. If the variance is high, it implies the data has a wide spread around the "mean" and vice versa. The  unbiased sample variance is calculated using the following :-
+	
+	
+	\begin{equation}
+	\sigma_x^2 = \frac{1}{N-1} \sum_{k=1}^{N} (x_k - \bar{x})^2
+	\end{equation}   	
+	Note the variance can also be denoted as $ \sigma_x^2 = E[(x-\bar{x})^2]$
+	
+	
+	\section{Covariance}
+	The covariance is a measure of how much two random variables change together and how strongly they relate. Taking two zero-mean signal $x(t)$ and $y(t)$, the covariance between them can be found using the following.
+	
+	\begin{equation}
+	\sigma(x,y) = \frac{1}{N-1}\sum_{k=1}^{N}(x_i - \bar{x})(y_i-\bar{y}) = E[(x - \bar{x})(y - \bar{y})] 
+	\end{equation} 
+	
+
+	
+	Hence, if $x(t)$ and $y(t)$
+are uncorrelated signal, then $\sigma_{xy} = 0$ \footnote{The Covariance of a signal $x(t)$ and $y(t)$ is most commonly denoted $\sigma_{xy}$}
+
+\section{The Covariance Matrix}
+
+Taking signal vector, $\underline{\bf x} (t)$, made up of $n$ random signals [$x_1,x_2,\ddddot{},x_n$], the covariance matrix contains all possible covariances between elements of the vector, resulting in the following:-
+\begin{equation}
+\sigma^2(\underline{\bf x} )=\left[\begin{array}{cccc}
+\sigma^2_{x_1} &\sigma_{x_1}\sigma_{x_2} &\dots& \sigma_{x_1}\sigma_{x_n}\\
+\sigma_{x_2}\sigma_{x_1} &\sigma^2_{x_2} &\dots& \sigma_{x_2}\sigma_{x_n}\\
+\vdots& \vdots& \ddots &\vdots\\
+\sigma_{x_n}\sigma_{x_1} &\sigma_{x_n}\sigma_{x_2} &\dots&\sigma^2_{x_n} \\
+\end{array}\right] \label{eq: Covariance matrix}
+\end{equation}	
+
+Due to the commutative property of the covariance between two signals, a covariance matrix is equal to is transpose. Also, if each data random signal above were independent of all other signals, the covariance matrix would be diagonal (i.e, all non-diagonal elements could be set to zero.) \footnote{Note \eqref{eq: Covariance matrix} is commonly written as $E[{\bf \underline{x}}{\bf \underline{x}}^\intercal]$}
+\newpage
+
+\section{Gaussian Variables}
+Gaussian distribution is a measure of the probability density function of a time-varying signal. The graph of the probabilities of the data plotted against the amplitude of the probability density function results in a bell-shaped curve as shown in figure \ref{fig: gaussian dis}
+
+
+
+\pgfmathdeclarefunction{gauss}{3}{%
+	\pgfmathparse{1/(#3*sqrt(2*pi))*exp(-((#1-#2)^2)/(2*#3^2))}%
+}
+
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+\begin{axis}[
+no markers, 
+domain=0:6, 
+samples=100,
+ymin=0,
+axis lines*=left, 
+xlabel=$x$,
+every axis y label/.style={at=(current axis.above origin),anchor=south},
+every axis x label/.style={at=(current axis.right of origin),anchor=west},
+height=5cm, 
+width=12cm,
+xtick=\empty, 
+ytick=\empty,
+enlargelimits=false, 
+clip=false, 
+axis on top,
+grid = major,
+hide y axis
+]
+
+\addplot [very thick,cyan!50!black] {gauss(x, 3, 1)};
+
+\pgfmathsetmacro\valueA{gauss(1,3,1)}
+\pgfmathsetmacro\valueB{gauss(2,3,1)}
+\draw [gray,dashed] (axis cs:1,0) -- (axis cs:1,\valueA)
+(axis cs:5,0) -- (axis cs:5,\valueA);
+\draw [gray,dashed] (axis cs:2,0) -- (axis cs:2,\valueB)
+(axis cs:4,0) -- (axis cs:4,\valueB);
+\draw [yshift=1.4cm, latex-latex](axis cs:2, 0) -- node [fill=white] {$0.683$} (axis cs:4, 0);
+\draw [yshift=0.3cm, latex-latex](axis cs:1, 0) -- node [fill=white] {$0.954$} (axis cs:5, 0);
+
+\node[below] at (axis cs:1, 0)  {$\bar{x} - 2\sigma$}; 
+\node[below] at (axis cs:2, 0)  {$\bar{x} - \sigma$}; 
+\node[below] at (axis cs:3, 0)  {$\bar{x}$}; 
+us\end{axis}
+\end{tikzpicture}
+\caption{Gaussian Distribution of a time-varying signal}
+\label{fig: gaussian dis}
+\end{figure}
+
+
+Note the Gaussian distribution can be represented by \eqref{eq: gaussian dis} 
+
+\begin{equation}
+f(x,\bar{x},\sigma) = \frac{1}{\sigma \sqrt{2\pi}}e^{-\frac{(x-\bar{x})}{2\sigma^2}}
+\label{eq: gaussian dis}
+\end{equation}  
+
+\section{White Noise}
+White noise can be considered as noise that contains all the possible frequency components at equal probability. It therefore has a flat probability distribution when plotted against frequency. However, it's Gaussian in terms of the amplitude of the noise. The spectral density function of white noise can be seen figure \ref{fig: white noise}
+	
+	\begin{figure}[h]
+		\centering
+		\begin{tikzpicture}
+\draw node at (0,-0.5){0}  ; 		
+\draw[->][line width=1.0pt] (-4.5,0) -- (4.5,0) node[anchor=north west] {\ensuremath{\omega}};
+\draw[->][line width=0.5pt] (0,0) -- (0,4.5) node[anchor=south east] {\ensuremath{S(j\omega)}};
+\draw[line width=1.7pt] (-4.5,2) -- (4.5,2) {};
+		\end{tikzpicture}
+		\caption{Spectral density function of white noise}
+		\label{fig: white noise}
+	\end{figure}

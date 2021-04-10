@@ -1,0 +1,120 @@
+\chapter{Week 6: 23\textsuperscript{rd} February- 1\textsuperscript{st} March }
+ \tocless\section{Objectives}
+\begin{itemize*}
+	\item Chose Mapping for GPS to find \ensuremath{xyz}
+	\item Test control on the Quad-rotor
+	\item  Prepare for the seminars 
+
+\end{itemize*}
+
+
+ \tocless\section{Test Quad-rotor}
+Fixing issues with program run-time on Propeller took longer than planned so no progress was made on actual testing.
+
+ \tocless\section{\gls{gps} conversion from \gls{ecef} frame to \gls{ned} frame }
+In other for the Quad-rotor to be stabilized in position another frame was introduced, but before the distance to move in the \gls{ned} frame can be found the distance to travel in the \gls{ecef} has to be found. This difference can be found if one knows the latitude \gls{latitude} and longitude \gls{longitude} on is at and the latitude \gls{latitude} and longitude \gls{longitude} the Quad-rotor has to go too. Once this is know, \eqref{Eq: xyz distance in circle coordinance} can be used to find $xyz$ displacement in the \gls{ecef} and then map this displacement using \eqref{Eq: ecef frame mapping}.
+
+
+\begin{align}
+\begin{split}
+N &= \frac{a}{\sqrt{1 - e^2\sin^2\gls{latitude}}}\\
+x&= (N+h)\cos(\gls{latitude})\cos(\gls{longitude})\\
+y &= (N+h)\cos(\gls{latitude})\sin(\gls{longitude})\\
+z &= [N(1-e^2)+h]\sin(\gls{latitude})
+\end{split}
+\label{Eq: xyz distance in circle coordinance}
+\end{align}
+
+{\bf Where:-}
+
+$h$: is the height of the quad-rotor from the surface of the planet.
+
+\newpage
+ 
+ 
+ In order to find out how far the quad-rotor has to go in order to reach the required position \footnote{And hence also control the quad-rotor} \eqref{Eq: xyz distance in circle coordinance} has to be mapped using the following:-
+ 
+ 
+ 
+ \begin{equation}
+ \begin{bmatrix}																
+ \gls{north}         			\\
+ \gls{east} 	  \\
+ \gls{down}
+ \end{bmatrix}
+ =
+ \begin{bmatrix}																
+ -S_{\gls{latitude}o}C_{\gls{longitude}o}	& -S_{\gls{latitude}o}S_{\gls{longitude}o}	 & C_{\gls{latitude}o}\\
+ -S_{\gls{longitude}o}		& C_{\gls{longitude}o} & 0\\
+ -C_{\gls{latitude}o}C_{\gls{longitude}o} 	& -C_{\gls{latitude}o}S_{\gls{longitude}o} & -S_{\gls{latitude}o}
+ \end{bmatrix}
+ \begin{bmatrix}																
+   x_p - x_o    			\\
+   y_p - y_o   	  \\
+  z_p - z_o 
+ \end{bmatrix} 
+\label{Eq: ecef frame mapping}
+ \end{equation}
+ 
+ {\bf where:-} $p$ subscript is the new point at which the quad-rotor is has to move to and $p$ subscript is the current location of the quad-rotor. Simialry one can find the velocity of the quad-rotor using the heading and speed measurements that the \gls{gps} module using the following:-
+ 
+ \begin{align}
+\begin{split}
+ \mathrm{Speed} &= \sqrt{\dot{x}^2 +\dot{y}^2 }\\
+ \mathrm{Heading} &= \arctan\left(\frac{\dot{x}}{\dot{y}}\right)
+\end{split}
+ \end{align}
+
+Thus the rate of change of position can also transformed by means of the following equations.
+
+ \begin{equation}
+ \begin{bmatrix}																
+ \dot{\gls{north}  }       			\\
+ \dot{\gls{east}} 	  \\
+ \dot{\gls{down}}
+ \end{bmatrix}
+ =
+ \begin{bmatrix}																
+ -S_{\gls{latitude}}C_{\gls{longitude}}	& -S_{\gls{latitude}}S_{\gls{longitude}}	 & C_{\gls{latitude}}\\
+ -S_{\gls{longitude}}		& C_{\gls{longitude}} & 0\\
+ -C_{\gls{latitude}}C_{\gls{longitude}} 	& -C_{\gls{latitude}}S_{\gls{longitude}} & -S_{\gls{latitude}}
+ \end{bmatrix}
+ \begin{bmatrix}																
+ \dot{x}  			\\
+ \dot{y}   	  \\
+ \dot{z} 
+ \end{bmatrix} 
+ \label{Eq: ecef frame mapping velocity}
+ \end{equation}
+
+
+
+
+%Using a Taylor series approximation Equations \ref{Eq:x_lateral_lin} and \ref{Eq:y_lateral_lin} can be further linearised to Equations \ref{Eq:x_lateral_lin1} and \ref{Eq:y_lateral_lin2}
+%\begin{align}
+%\ddot{x} &= g\cdot \gls{pitch}\label{Eq:x_lateral_lin1}\\ 
+%\ddot{y} &= -g\cdot \gls{roll}\label{Eq:y_lateral_lin2}
+%\end{align}
+
+where 
+\begin{align}
+\begin{split}
+\dot{x} = \sqrt{\frac{(\mathrm{speed}^2)}{1 + \tan(\mathrm{heading})^2}}\\
+\dot{y} = \sqrt{(\mathrm{speed})^2 - \dot{x}^2}
+\end{split}
+\end{align}
+
+ \tocless\section{Seminar Presentation}
+The seminar was on Friday 27th February. Filter graphs recorded for use in presentation.
+
+
+
+
+
+
+
+
+
+
+
+

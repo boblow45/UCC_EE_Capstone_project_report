@@ -1,0 +1,15 @@
+\chapter{Conclusion}
+
+A mathematical mode of the quad-rotor has be developed. Models for the accelerometer, gyroscope and magnetometer have been developed (as seen in  Section \ref{sec:imu section for relation of stuff})and proven to be correct by means of experiment. A \gls{gps} model has also been presented in Section \ref{sec: gps part} and can be used in future projects if a \gls{gps}-based device is used.
+
+
+As the sensors used in the project are not ideal, the attitude of the quad-rotor had to be estimated by means of data fusion. These estimators have been tested in both simulation and on the quad-rotor.
+
+The pitch and roll estimates were compared with actual values and the results showed that the filters worked as required an indeed produced an optimal response. Chapter \ref{chap: kalman implem} shows that the Kalman Filter is the optimal choice, but is more computationally intensive to run on some micro-controllers than a Complementary Filter. If the Kalman Filter is not an option, then a Complementary Filter similar to the ones presented in this report can be used for attitude estimate as they are less computational intensive.
+
+
+The attitude estimators were designed and simulated using Simulink and MatLab. The results showed from these simulations demonstrated that these estimators could be implemented to control the quad-rotor. The Complementary Filter and Kalman Filer where both tested on the quad-rotor with a \gls{lqr} based control scheme and both were shown to give adequate  results.
+
+Finally, the report gives a detailed description of how the filters compare to each other and how they can be implemented on a micro-controller. 
+
+

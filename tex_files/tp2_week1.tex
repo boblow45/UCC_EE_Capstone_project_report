@@ -1,0 +1,177 @@
+\chapter{Week 1: 19\textsuperscript{th} - 25\textsuperscript{th} January }
+
+ \tocless\subsection{Accelerometer model}
+In order to implement the complementary filter a model of the accelerometer had to be created that links the data output of the device to the actual angle of the quad-rotor, hence the following equations where developed.
+
+\begin{equation}
+\begin{bmatrix}
+\gls{ax} \\ \gls{ay} \\\gls{az}
+\end{bmatrix}
+= 
+g
+\begin{bmatrix}
+-S_{\gls{pitch}}\\ C_{\gls{pitch}}S_{\gls{roll}}\\C_{\gls{pitch}}C_{\gls{roll}} 
+\end{bmatrix}
++
+\begin{bmatrix}
+\mu_{m-x}\\ \mu_{m-y}\\\mu_{m-z}
+\end{bmatrix}		
++
+\begin{bmatrix}
+\gls{accbaisx}\\ \gls{accbaisy}\\\gls{accbaisz}
+\end{bmatrix}
+\label{eq:acc simplified equation}
+\end{equation}
+
+Now if one assumes that the bias and noise on the accelerometer is zero (can be removed in code)  one can find the angle of the Quad-rotor in the \gls{ned} frame . Hence the \gls{roll} and \gls{pitch} can be defined as follows:-
+
+\begin{align}
+\begin{split}
+\gls{roll} &= \arctan\left(\frac{\gls{ay}}{\gls{az}}\right)\\
+\gls{pitch} &= \arctan \left(\frac{- \gls{ax}}{\sqrt{\gls{ay}^2+\gls{az}^2}}\right)
+\label{Eq: angles from acc}
+\end{split}
+\end{align} 
+
+ \tocless\subsection{Gyroscope model}
+A similar model for the gyroscope was created as the angular velocity measured by the gyroscope does not correspond to the Euler angle rates $[\dot{\gls{roll}},\dot{\gls{pitch}},\dot{\gls{yaw}}]^\intercal$ . Instead one can define the rate of change of angle with respect to the earth frame \gls{ned} as follows:-
+
+
+\begin{equation}
+\begin{bmatrix}																
+\gls{wx}         			\\
+\gls{wy} 	  \\
+\gls{wz}
+\end{bmatrix} =
+\begin{bmatrix}																
+1	& 0						 & -S_{\gls{pitch}}           			\\
+0 	& C_{\gls{roll}}   & S_{\gls{roll}}C_{\gls{pitch}}   \\
+0 	& -S_{\gls{roll}}  & C_{\gls{roll}}C_{\gls{pitch}}\end{bmatrix}
+\begin{bmatrix}																
+\dot{\gls{roll} }        			\\
+\dot{\gls{pitch}} 	  \\
+\dot{\gls{yaw}}\end{bmatrix}
+\end{equation}
+
+Now taking the in the inverse one gets the following:-
+\begin{equation}
+\begin{bmatrix}																
+\dot{\gls{roll} }        			\\
+\dot{\gls{pitch}} 	  \\
+\dot{\gls{yaw}}
+\end{bmatrix}
+=
+\begin{bmatrix}																
+1	& S_{\gls{roll}}T_{\gls{pitch}}	 & C_{\gls{roll}}T_{\gls{pitch}}           			\\
+0 	& C_{\gls{roll}}   & -S_{\gls{roll}}  \\
+0 	& \frac{S_{\gls{roll}} }{C_{\gls{pitch}}} & \frac{C_{\gls{roll}}}{C_{\gls{pitch}}}
+\end{bmatrix}
+\begin{bmatrix}																
+\gls{wx}         			\\
+\gls{wy} 	  \\
+\gls{wz}
+\end{bmatrix} 
+\label{Eq: angleur velocity from gyro}
+\end{equation}
+
+ \tocless\section{ Complementary Filter}
+A pair of filters are called complementary filters if their transfer functions sum to one at all frequencies in a complex sense, i.e. the phase is zero and the magnitude is one \ref{eq: bases of comp filter}.
+
+
+\begin{equation}
+G_1(s) + G_2(s) =1 \label{eq: bases of comp filter}
+\end{equation}
+
+ \tocless\subsection{First Order Complementary Filter}
+
+To start with a first order complementary filter was design using \eqref{eq: filter order filter}. This first order filter had adequate results.
+\begin{equation}
+\gls{filterdata} = \underbrace{\frac{1}{1 + \tau s}}_{\text{$G_1(s)$}}\gls{accdata} + \underbrace{\frac{\tau s}{1 + \tau s}}_{\text{$G_2(s)$}}\frac{1}{s}\gls{gyrodata}
+\label{eq: filter order filter}
+\end{equation}
+
+
+Using \eqref{Eq: angles from acc}, \eqref{Eq: angleur velocity from gyro} and\eqref{eq: filter order filter} the high frequency components of the estimated orientation angles where found by a high-pass filter on the gyroscope data:-
+\begin{align}
+	\dot{\gls{roll}}_{hp} &=   \gls{wx} + S_{\gls{roll}}T_{\gls{pitch}}\gls{wy} + C_{\gls{roll}}T_{\gls{pitch}}\gls{wz}   - \frac{\gls{roll}_{hp}}{\tau}\\
+	\dot{\gls{pitch}}_{hp} &=  C_{\gls{roll}}\gls{wy} - S_{\gls{roll}}\gls{wz} - \frac{\gls{pitch}_{hp}}{\tau}
+\end{align}
+
+Similarly the low-pass equivalents are found using the following:-
+
+\begin{align}
+\dot{\gls{roll}}_{lp} &=   \frac{1}{\tau}\left[\arctan\left(\frac{\gls{ay}}{\gls{ay}}\right) - \gls{roll}_{lp}\right]\\
+\dot{\gls{pitch}}_{lp} &=  \frac{1}{\tau}\left[\arctan\left(\frac{-\gls{ax}}{\sqrt{\gls{ay}^2+\gls{az}^2}}\right) - \gls{pitch}_{lp}\right]
+\end{align}
+
+ \tocless\subsection{Difference Equations for first order filter}
+\eqref{eq: filter order filter} was emulated into the digital domain using Tustain's approximation to integration. Tustain's method was chosen as it ensures a stable mapping into the discrete domain (maps to inside the unit circle) if the continues function is stable, forward rectangular rule and backward rectangular rule do not ensure this. \footnote{See \url{http://web.cecs.pdx.edu/~tymerski/ece452/6.pdf} for more details}.
+
+\begin{equation}
+\gls{filterdata} [k] = \frac{1}{\gls{ts} + 2\tau}(\gls{ts} ( \gls{accdata} [k] + \gls{accdata} [k-1] + \tau(\gls{gyrodata} [k]+\gls{gyrodata} [k-1])) -(\gls{ts} -2\tau)\gls{filterdata} [k-1] )
+\end{equation}
+
+Note it can be easily shown that if there is a bias \gls{accbaisx} on the $x$-axis of the gyroscope then there will be an offset angle when one integrates the gyroscope reading. For the first order filter this offset (for the $x$-axis)can be approximated by use of the filter time constant and is defined as follows:-
+
+\[\theta_{offs} \approx {\tau}\gls{accbaisx} \]
+ \tocless\subsection{Second Order Complementary Filter}
+
+A complementary filter is easily derived by solving the transfer function of the Mahony \& Madgwick filter for the angle $\theta$, which yields
+
+\begin{equation}
+\gls{filterdata}=\underbrace{ {\frac{K_i + K_p s}{K_i + K_p s + s^2}}}_{\text{$G_1(s)$}}\gls{accdata} + \underbrace{\frac{s^2}{K_i+K_p s + s^2}}_{\text{$G_2(s)$}}\frac{1}{s}\gls{gyrodata}
+\label{eq: second order filter}
+\end{equation}
+
+Obviously, and not unexpectedly, this complementary filter is build from $2^{\mathrm{nd}}$ order filters. Note that the filter acting on the acceleration data actually consists of a low-pass plus band-pass filter.
+
+This result has interesting consequences. Being $2^{\mathrm{nd}}$ order filters, the frequency response of the acceleration and rotation rate filters are characterized by the resonance frequency and damping factor
+
+\begin{equation}
+\omega_0 = \sqrt{K_i}~~~~~~~ \xi = \frac{K_p}{2\sqrt{K_i}}
+\end{equation}
+
+The damping factor determines the overshoot at the resonance frequency. For high-pass (and low-pass) filters the frequency response is flat (and the step response non-oscillatory) for $\xi \geq 1$. This suggests the criterion \footnote{See \url{http://www.olliw.eu/2013/imu-data-fusing/} for more details}.
+
+\begin{equation}
+K_i \leq \frac{1}{4}K_p^2
+\end{equation}
+
+
+To find the a method of modelling the filter in MatLab $G_1(s)$ and $G_2(s)$ where arranged as follows:-
+\begin{align}
+\chi_{hp} &= \frac{1}{s}\left[\gls{gyrodata} - \chi_{hp}\left({\frac{K_i}{s} + K_p}\right)\right] \label{Eq: second order comp high pass second}\\
+\chi_{lp}  &= \frac{1}{s}\left[(\gls{accdata} - \chi_{lp})\left({\frac{K_i}{s} + K_p}\right)\right] \label{Eq: second order comp low pass second}
+\end{align}
+
+
+Note \eqref{Eq: second order comp high pass second} and \eqref{Eq: second order comp low pass second} can be combined to yield the following filter (as $\chi_{hp} + \chi_{lp} =  \gls{filterdata} $), which can also be modelled in MatLab.
+
+\begin{equation}
+\gls{filterdata}  = \frac{1}{s}\left[\gls{gyrodata} +\left({\frac{K_i}{s} + K_p}\right)(\gls{filterdata}   - \gls{accdata})\right] \label{eq: comp filter equation used to tune comp filter}
+\end{equation}
+
+
+ \tocless\subsection{Difference Equations for second order filter}
+\eqref{Eq: second order comp high pass second}, \eqref{Eq: second order comp low pass second} were emulated into the digital domain using Tustain's method, which yielded the following equations:-
+\begin{align}
+\chi_{hp}[k] &= \frac{1}{\eta + 4}\left(2\gls{ts} ( \gls{gyrodata} [k] - \gls{gyrodata} [k -2] ) - (\Gamma + 4)\chi_{hp}[k-2] - (\xi - 8)\chi_{hp}[k-1] \right) \label{Eq: second order comp high pass second difference eq}\\
+\chi_{lp}[k]  &= \frac{1}{\eta +4}\left(\Gamma \gls{accdata} [k-2] + \xi \gls{accdata} [k-1] + \eta \gls{accdata} [k] - (\Gamma + 4)\chi_{lp}[k-2] - (\xi - 8) \chi_{lp}[k - 1] \right) \label{Eq: second order comp low pass second difference eq}
+\end{align}
+
+
+where:-
+
+\begin{equation*}
+\eta = K_i\gls{ts}^2 + 2K_p\gls{ts};~~~ \Gamma = K_i\gls{ts}^2 - 2 K_p\gls{ts};~~~ \xi = 2K_i\gls{ts}^2
+\end{equation*}
+
+Note \eqref{Eq: second order comp high pass second difference eq} and \eqref{Eq: second order comp low pass second difference eq} can be combined to give the following:-
+
+\begin{multline}
+\gls{filterdata} [k] = \frac{1}{\eta +4}(\Gamma \gls{accdata} [k-2] + \xi \gls{accdata} [k-1] + \eta \gls{accdata} [k] + 2\gls{ts} ( \gls{gyrodata} [k] \\
+- \gls{gyrodata} [k -2] )   - (\Gamma + 4)\gls{filterdata} [k-2] - (\xi - 8) \gls{filterdata} [k - 1] ) \label{Eq: full dfference equation for the second order filter}
+\end{multline}
+
+
+

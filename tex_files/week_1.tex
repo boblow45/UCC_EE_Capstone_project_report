@@ -1,0 +1,77 @@
+\chapter{Week 1: 22\textsuperscript{nd} - 28\textsuperscript{th} September }
+
+ \tocless\subsection{Objectives}
+
+\begin{itemize*}
+	\item Research Kalman Filters
+	\item Understand mapping used for  aeronautics (Euler angles matrix \& Euler Rates Matrix)
+	\item Equipment/Resources required for the project.
+\end{itemize*}
+
+
+ \tocless\subsection{Kalman Filters}
+
+Kalman filtering, also known as linear quadratic estimation {(\bf LQE)} is best described as a {\bf recursive estimator}. The filter works by using a model of ones system \footnote{Kinematics equations which can model the flight of a Quad-rotor} and the readings from a sensor(s). The filter works in two stages:  \textit{Predict} and \textit{Update}. The first stage, the \textit{Predict} stage  uses the previous state ($\hat{\bf  x}_{k-1|k-1}$ )and set point input (${\bf u}_k$ )to make a prediction of the devices location. After the \textit{Predict} stage the \textit{Update} stage is carried out and uses the current measured data ($\hat{\bf x}_{k|k-1} $), the product of the Kalman gain $ {\bf K}_k $ and prediction error $(\tilde{\bf z}_k)$. \footnote{ See pg 480 of the 'The art of control engineering' for more information.}
+\begin{align}
+\hat{\bf x}_{k|k-1} & ={\bf F}_k\hat{\bf  x}_{k-1|k-1} + {\bf B}_k {\bf u}_k\\
+\hat{\bf  x}_{k|k} & = \hat{\bf x}_{k|k-1} + {\bf K}_k \tilde{\bf z}_k\\
+\tilde{\bf z}_k &= {\bf z}_k - {\bf H}_k\hat{\bf x}_{k|k-1} 
+\end{align}
+
+The performance of this filter depends heavily upon the accuracy of $\bf Q$ (Covariance matrix for the measurement noise) and $\bf R$ (Covariance matrix for the disturbances). Note $\bf R$ can often be intelligently estimated from knowledge of the system under control. But the $\bf Q$ is more of a problem and often very little real information will be known.  Therefore { $\bf Q$} is often guessed and $\bf R$ and $\bf Q$ are tuned together to get an adequate result for the control of the device.
+
+ \tocless\subsection{Euler Angles and Rotational Matrices}
+
+To describe the orientation and position of objects in space (parts, tools, aircraft, etc) one attaches a coordinate system to each object and then one gives a description of one coordinate system relative to another. One assumes the existence of a \textit{universal} coordinate system w.r.t which other Cartesian system can be defined. \\
+
+This report shall be using Tait–Bryan angles.  This angling system uses three perpendicular axis of rotation: Roll, Pitch and Yaw which are denoted by ($\gls{pitch},\gls{roll},\gls{yaw}$)  and are rotations about the $(\bf x,y,z)$-axes respectfully. This system is used over the Euler angle system because Tait–Bryan angles don't rely on the same rotation twice (e.g in {\bf Z-Y-Z} one relies upon a Roll-Pitch-Roll type axes, thus one has to use a Roll type axis twice).
+
+The following equation relates a body $\bf b$ in free space to another point in space $\bf w$ which in this case is a fixed point on the world.
+
+\begin{equation}
+\gls{rotationmatrix}(\gls{pitch},\gls{roll},\gls{yaw}) = {\bf R}(\gls{pitch}){\bf R}(\gls{roll}){\bf R}(\gls{yaw})
+\label{eq: rotation matrix}
+\end{equation}
+
+Now using the following rotational matrices around the $(\bf x,y,z)$ axes respectively, one can relate any body $\bf b$ in free space to the a fixed frame $\bf w$.
+
+ \begin{align}
+{\bf R}_1(\alpha) &=  \begin{bmatrix}
+1& 0 & 0           \\
+0 & C_{\alpha}         & S_{\alpha}   \\
+0           & -S_{\alpha}  & C_{\alpha}  
+\end{bmatrix}\\
+{\bf R}_2(\alpha) &=  \begin{bmatrix}
+C_{\alpha}& 0 & -S_{\alpha}         \\
+0 & 1       & 0   \\
+S_{\alpha}   & 0 & C_{\alpha}  
+\end{bmatrix}\\
+{\bf R}_3(\alpha) &=  \begin{bmatrix}
+C_{\alpha}&  S_{\alpha}   & 0       \\
+- S_{\alpha}   & C_{\alpha}  & 0 \\
+0   & 0 & 1 
+\end{bmatrix}
+\label{eq: rotation matrix in z direction}
+ \end{align}
+
+Using the above \eqref{eq: rotation matrix} to \eqref{eq: rotation matrix in z direction} one can generate the \textit{Euler Rates Matrix} which relates the angler change $\dot{\gls{pitch}}$ to the angler velocity $\bm{\omega}$. \footnote{both of this books where used for understanding of frames \cite{cai2011unmanned} and \cite[pg.~2-27]{jekeli2001inertial}} 
+
+\begin{equation}
+\bm{\omega} = \dot{\gls{yaw}} \bm{\hat{n}_3}+\dot{\gls{pitch}}\bm{\hat{b}'_2} + \dot{\gls{roll}}\hm{\hat{b}_1}
+\end{equation}
+
+
+ \tocless\subsection{Required Resources}
+
+After reading other Quad-Rotor reports a list of required materials was made up and items already purchased were removed. The following is a list of items which will be needed in the future to complete the project.
+
+ \tocless\subsubsection{Required Materials}
+\begin{itemize*}
+\item Parallax Propeller.
+\item Propeller Plug (FTDI, USB to SERIAL chip)
+\item SD Card.
+\item SD Card reader. 
+\item Crystal Oscillator (\SI[mode=text]{5}{\mega\Hz})
+\item Bread/Strip board.
+\item 3.3 to 5 volt level shifter.
+\end{itemize*}

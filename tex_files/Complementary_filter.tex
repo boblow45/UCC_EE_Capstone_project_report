@@ -1,0 +1,27 @@
+\chapter{ Complementary Filter}
+A pair of filters are called complementary filters if their transfer functions sum to one at all frequencies in a complex sense, i.e. the phase is zero and the magnitude is one.
+
+
+
+
+
+
+A complementary filter is easily derived by solving the transfer function of the Mahony \& Madgwick filter for the angle $\theta$, which yields
+
+\begin{equation}
+\theta = {\frac{1 + \frac{K_p}{K_i}s}{1 + \frac{K_p}{K_i}s + \frac{1}{K_i}s^2}}a + {\frac{\frac{1}{K_i}S^2}{1+\frac{K_p}{K_i}s + \frac{1}{K_i}s^2}\frac{1}{s}\omega}
+\end{equation}
+
+Obviously, and not unexpectedly, this complementary filter is build from $2^{\mathrm{nd}}$ order filters. Note that the filter acting on the acceleration data actually consists of a low-pass plus band-pass filter.
+
+This result has interesting consequences. Being $2^{\mathrm{nd}}$ order filters, the frequency response of the acceleration and rotation rate filters are characterized by the resonance frequency and damping factor
+
+\begin{equation}
+\omega_0 = \sqrt{K_i}~~~~~~~ \xi = \frac{K_p}{2\sqrt{K_i}}
+\end{equation}
+
+The damping factor determines the overshoot at the resonance frequency. For high-pass (and low-pass) filters the frequency response is flat (and the step response non-oscillatory) for $\xi \geq 1$. This suggests the criterion \footnote{See \url{http://www.olliw.eu/2013/imu-data-fusing/} for more details}.
+
+\begin{equation}
+K_i \leq \frac{1}{4}K_p^2
+\end{equation}
